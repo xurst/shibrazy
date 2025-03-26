@@ -14,3 +14,6 @@ src
 
 /requirements.txt
 !/dist/requirements.txt
+
+*.pyc
+!/dist/**/*.pyc
