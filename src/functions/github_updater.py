@@ -1,149 +1,161 @@
+# src/functions/github_updater.py
 import os
 import sys
 import requests
-import shutil
-from packaging import version
-import subprocess
-from pathlib import Path
 import tempfile
 import zipfile
-from colorama import Fore, Style  # Add this import
+import shutil
+import re
+from packaging import version
+from colorama import Fore, Style
 
 class GitHubUpdater:
-    """handles checking for and applying updates from github."""
-    
     def __init__(self, repo_owner, repo_name, current_version):
-        """
-        initialize the updater with repository details.
-        
-        args:
-            repo_owner (str): github repository owner
-            repo_name (str): github repository name
-            current_version (str): current version of the application
-        """
         self.repo_owner = repo_owner
-        self.repo_name = repo_name
+        self.repo_name = repo_name  # Using the parameter value directly
         self.current_version = current_version
-        self.api_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/releases/latest"
-        self.release_info = None
-        
+        # FIX 1: Using the correct repo_name from parameters instead of hardcoded value
+        self.api_base_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}"
+        self.latest_version = None
+        self.latest_release_url = None
+
     def check_for_update(self):
         """
-        check if an update is available.
-        
-        returns:
-            bool: true if an update is available, false otherwise
+        Check for updates by examining the source code directly instead of using releases.
+        This fixes both bugs:
+        1. Not using releases endpoint which gives 404
+        2. Checking actual source code, not just comparing version numbers
         """
         try:
-            response = requests.get(self.api_url, timeout=10)
-            response.raise_for_status()
-            self.release_info = response.json()
-            
-            latest_version = self.release_info['tag_name'].lstrip('v')
-            return version.parse(latest_version) > version.parse(self.current_version)
-        except Exception as e:
-            print(f"{Fore.YELLOW}warning: could not check for updates: {e}{Style.RESET_ALL}")
-            return False
-            
-    def prompt_for_update(self):
-        """
-        display update prompt and handle user response.
-        
-        returns:
-            bool: true if user chose to update, false otherwise
-        """
-        if not self.release_info:
-            return False
-            
-        latest_version = self.release_info['tag_name'].lstrip('v')
-        
-        print(f"\n{Fore.CYAN}=== update available ==={Style.RESET_ALL}")
-        print(f"current version: {Fore.RED}v{self.current_version}{Style.RESET_ALL}")
-        print(f"latest version: {Fore.GREEN}v{latest_version}{Style.RESET_ALL}")
-        
-        if 'body' in self.release_info and self.release_info['body']:
-            print(f"\n{Fore.CYAN}release notes:{Style.RESET_ALL}")
-            print(f"{self.release_info['body'][:200]}...")
-            
-        print(f"\n{Fore.YELLOW}this application requires the latest version to run.{Style.RESET_ALL}")
-        print(f"1. update now")
-        print(f"2. exit")
-        
-        while True:
-            choice = input(f"\n{Fore.YELLOW}select option (1-2): {Style.RESET_ALL}").strip()
-            if choice == "1":
-                return True
-            elif choice == "2":
+            # Get repository information to find the default branch
+            repo_response = requests.get(self.api_base_url)
+            if repo_response.status_code != 200:
+                print(f"{Fore.RED}warning: could not check for updates: {repo_response.status_code} {repo_response.reason} for url: {self.api_base_url}{Style.RESET_ALL}")
+                if repo_response.status_code == 404:
+                    print(f"{Fore.YELLOW}hint: repository '{self.repo_name}' not found. check the repository name{Style.RESET_ALL}")
                 return False
-            else:
-                print(f"{Fore.RED}invalid choice. please select 1-2.{Style.RESET_ALL}")
+            
+            repo_data = repo_response.json()
+            default_branch = repo_data.get('default_branch', 'main')
+            
+            # Try to find constants.py in the repository
+            constants_url = f"{self.api_base_url}/contents/src/core/constants.py?ref={default_branch}"
+            constants_response = requests.get(constants_url)
+            
+            # FIX 2: Check the remote version directly from constants.py in the repository
+            # This way, even if someone changes their local version number, we compare with the actual remote version
+            if constants_response.status_code == 200:
+                constants_data = constants_response.json()
+                if constants_data.get('type') == 'file' and constants_data.get('name') == 'constants.py':
+                    # Get the raw content
+                    constants_content = requests.get(constants_data.get('download_url')).text
+                    
+                    # Extract SHIBRAZY_VERSION from remote constants.py
+                    version_match = re.search(r'SHIBRAZY_VERSION\s*=\s*([0-9.]+)', constants_content)
+                    if version_match:
+                        remote_version = float(version_match.group(1))
+                        
+                        # Compare versions
+                        if remote_version > self.current_version:
+                            print(f"{Fore.GREEN}update available: v{remote_version} (current: v{self.current_version}){Style.RESET_ALL}")
+                            self.latest_version = remote_version
+                            self.latest_release_url = f"{self.api_base_url}/zipball/{default_branch}"
+                            return True
+                        else:
+                            print(f"{Fore.GREEN}you're running the latest version (v{self.current_version}){Style.RESET_ALL}")
+                            return False
+            
+            # If we couldn't find or parse constants.py, fall back to checking latest commit
+            commits_url = f"{self.api_base_url}/commits/{default_branch}"
+            commits_response = requests.get(commits_url)
+            
+            if commits_response.status_code == 200:
+                commit_data = commits_response.json()
+                latest_commit_sha = commit_data.get('sha')
+                commit_date = commit_data.get('commit', {}).get('author', {}).get('date')
                 
-    def download_and_install_update(self):
-        """
-        download and install the latest update.
-        
-        returns:
-            bool: true if update was successful, false otherwise
-        """
-        if not self.release_info:
+                if latest_commit_sha:
+                    print(f"{Fore.YELLOW}couldn't determine version from source code. checking latest commit.{Style.RESET_ALL}")
+                    print(f"{Fore.YELLOW}latest commit: {latest_commit_sha[:7]} on {commit_date}{Style.RESET_ALL}")
+                    
+                    # Additional security by suggesting update based on latest commit
+                    print(f"{Fore.YELLOW}potentially new code available. update recommended.{Style.RESET_ALL}")
+                    self.latest_release_url = f"{self.api_base_url}/zipball/{default_branch}"
+                    return True
+            
+            print(f"{Fore.RED}could not check for updates. please check manually.{Style.RESET_ALL}")
             return False
             
-        try:
-            # get download url for zip file
-            zip_url = None
-            for asset in self.release_info.get('assets', []):
-                if asset['name'].endswith('.zip'):
-                    zip_url = asset['browser_download_url']
-                    break
-                    
-            # fall back to source code if no zip asset found
-            if not zip_url:
-                zip_url = self.release_info['zipball_url']
-                
-            print(f"{Fore.CYAN}downloading update...{Style.RESET_ALL}")
-            
-            # download the update
-            response = requests.get(zip_url, stream=True, timeout=60)
-            response.raise_for_status()
-            
-            # create a temporary directory for the download
-            with tempfile.TemporaryDirectory() as temp_dir:
-                zip_path = os.path.join(temp_dir, "update.zip")
-                
-                # save the zip file
-                with open(zip_path, 'wb') as f:
-                    for chunk in response.iter_content(chunk_size=8192):
-                        f.write(chunk)
-                        
-                # create the new directory for the update
-                current_dir = Path(os.path.abspath(__file__)).parent
-                parent_dir = current_dir.parent
-                new_dir_name = f"{self.repo_name}-{self.release_info['tag_name'].lstrip('v')}"
-                new_dir = os.path.join(parent_dir, new_dir_name)
-                
-                # extract the zip file
-                with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-                    # get the root directory in the zip
-                    root_dir = zip_ref.namelist()[0].split('/')[0]
-                    zip_ref.extractall(temp_dir)
-                    
-                    # move files to the new directory
-                    extracted_dir = os.path.join(temp_dir, root_dir)
-                    if os.path.exists(new_dir):
-                        shutil.rmtree(new_dir)
-                    shutil.copytree(extracted_dir, new_dir)
-                    
-            print(f"{Fore.GREEN}update downloaded successfully to: {new_dir}{Style.RESET_ALL}")
-            print(f"{Fore.YELLOW}starting new version...{Style.RESET_ALL}")
-            
-            # launch the new version
-            new_main_py = os.path.join(new_dir, "main.py")
-            subprocess.Popen([sys.executable, new_main_py])
-            
-            # exit the current instance
-            sys.exit(0)
-            
         except Exception as e:
-            print(f"{Fore.RED}error during update: {e}{Style.RESET_ALL}")
-            input("press enter to exit...")
+            print(f"{Fore.RED}error checking for updates: {e}{Style.RESET_ALL}")
+            return False
+
+    def prompt_for_update(self):
+        response = input(f"{Fore.YELLOW}would you like to update now? (y/n): {Style.RESET_ALL}").strip().lower()
+        return response == 'y'
+
+    def download_and_install_update(self):
+        if not self.latest_release_url:
+            print(f"{Fore.RED}no update information available{Style.RESET_ALL}")
+            return False
+        
+        try:
+            print(f"{Fore.CYAN}downloading update...{Style.RESET_ALL}")
+            response = requests.get(self.latest_release_url, stream=True)
+            
+            if response.status_code != 200:
+                print(f"{Fore.RED}failed to download update: {response.status_code} {response.reason}{Style.RESET_ALL}")
+                return False
+            
+            # Save the downloaded file
+            temp_dir = tempfile.mkdtemp()
+            temp_zip = os.path.join(temp_dir, "update.zip")
+            
+            with open(temp_zip, 'wb') as f:
+                for chunk in response.iter_content(chunk_size=8192):
+                    if chunk:
+                        f.write(chunk)
+            
+            # Extract the update
+            print(f"{Fore.CYAN}extracting update...{Style.RESET_ALL}")
+            with zipfile.ZipFile(temp_zip, 'r') as zip_ref:
+                zip_ref.extractall(temp_dir)
+            
+            # Find the extracted directory (it usually has the commit hash in the name)
+            extracted_dirs = [d for d in os.listdir(temp_dir) if os.path.isdir(os.path.join(temp_dir, d)) and d != "__MACOSX"]
+            if not extracted_dirs:
+                print(f"{Fore.RED}failed to find extracted update files{Style.RESET_ALL}")
+                return False
+            
+            extracted_dir = os.path.join(temp_dir, extracted_dirs[0])
+            
+            # Install the update by copying files
+            print(f"{Fore.CYAN}installing update...{Style.RESET_ALL}")
+            app_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+            
+            # Copy all files except certain directories/files
+            exclude = {'.git', 'venv', '__pycache__', 'dist', 'temp_src'}
+            for item in os.listdir(extracted_dir):
+                if item in exclude:
+                    continue
+                
+                src_path = os.path.join(extracted_dir, item)
+                dst_path = os.path.join(app_dir, item)
+                
+                if os.path.isdir(src_path):
+                    # Copy directory
+                    if os.path.exists(dst_path):
+                        shutil.rmtree(dst_path)
+                    shutil.copytree(src_path, dst_path)
+                else:
+                    # Copy file
+                    shutil.copy2(src_path, dst_path)
+            
+            # Clean up
+            shutil.rmtree(temp_dir)
+            
+            print(f"{Fore.GREEN}update installed successfully. please restart the application.{Style.RESET_ALL}")
+            return True
+        except Exception as e:
+            print(f"{Fore.RED}error installing update: {e}{Style.RESET_ALL}")
             return False

@@ -4,12 +4,12 @@ import os
 import re
 import time
 from discord_webhook import DiscordWebhook, DiscordEmbed
-from src.functions.client.message_handler import MessageChecker
+from functions.client.message_handler import MessageChecker
 import aiohttp
 import asyncio
 from datetime import datetime
 import dateutil.parser
-from src.core.constants import (
+from core.constants import (
     SERVERS,
     TIMING,
     OUTPUT

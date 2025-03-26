@@ -1,5 +1,5 @@
 import re
-from src.core.constants import (
+from core.constants import (
     SOUND,
     OUTPUT,
     TIMING,

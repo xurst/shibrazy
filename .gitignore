@@ -2,16 +2,16 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-.idea
-
 *.env
 saved_key.json
 
 .DS_Store
 Thumbs.db
-server/*
 
-/src/
+.idea
+server/*
+temp_src
+src
 
 .pyarmor_capsule.zip
 .pyarmor_license.txt

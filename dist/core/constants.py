@@ -12,10 +12,10 @@ SHIBRAZY_VERSION = 1.47
 
 # Animation configuration tables
 ANIMATION = {
-    "enabled": False,  # Master toggle for all animations
+    "enabled": True,  # Master toggle for all animations
 
     "title": {
-        "text": f"shibrazy v{SHIBRAZY_VERSION}",  # Use f-string for dynamic version
+        "text": f"shibrazy v{SHIBRAZY_VERSION}",
         "color": "RED",
         "glitch_iterations": 3,
         "glitch_chars": "!@#$%^&*()_+-={}[]|;:,.<>?",
@@ -98,106 +98,28 @@ NOTIFICATIONS = {
 
 # Server configuration table
 SERVERS = {
-    1186570213077041233: {
-        "name": "Sol's RNG",
+    0000000000000000000: {  # Placeholder server ID
+        "name": "Placeholder Server",
         "channels": {
-            "1282542323590496277": {
-                "name": "biomes",
-                "webhook_url": os.getenv('SOLS_RNG_BIOMES_WEBHOOK'),
-                "format": "new",  # Can be "old" or "new"
-                "game_id": "15532962292",
-                "game_name": "Sol's RNG [Eon1-1]",
-                "whitelist": {
-                    "keywords": ["glitch", "glitched"],
-                    "match_any": True,
-                    "fuzzy_exclusions": []
-                },
-                "blacklist": {
-                    "keywords": ["bait", "pls", "fake", "scam", "where", "not", "baiters", "unreal", "totally", "astrald", "hunting", "hunt", "was", "aura", "when", "waiting", "no", "macro"],
-                    "match_any": True,
-                    "fuzzy_exclusions": []
-                }
-            },
-            "1282543762425516083": {
-                "name": "merchants",
-                "webhook_url": os.getenv('SOLS_RNG_MERCHANTS_WEBHOOK'),
-                "format": "new",  # Can be "old" or "new"
-                "game_id": "15532962292",
-                "game_name": "Sol's RNG [Eon1-1]",
-                "whitelist": {
-                    "keywords": ["mari", "void", "coin", "lucky", "penny", "gear", "trash", "vc", "lp", "jester", "oblivion"],
-                    "match_any": True,
-                    "fuzzy_exclusions": []
-                },
-                "blacklist": {
-                    "keywords": [],
-                    "match_any": True,
-                    "fuzzy_exclusions": []
-                }
-            },
-        }
-    },
-    1284692110242746441: {
-        "name": "Radiant Team",
-        "channels": {
-            "1287614809705021470": {
-                "name": "glitch-ping-radiant",
-                "webhook_url": os.getenv('RADIANT_TEAM_GLITCH_WEBHOOK'),
+            000000000000000000: {  # Placeholder channel ID
+                "name": "placeholder-channel",
+                "webhook_url": os.getenv('PLACEHOLDER_WEBHOOK'),
                 "format": "new",
-                "game_id": "15532962292",
-                "game_name": "Sol's RNG [Eon1-1]",
+                "game_id": "00000000000",
+                "game_name": "Placeholder Game",
                 "whitelist": {
-                    "keywords": ["glitch", "glitched", "<@&1287615051888594944>"],
+                    "keywords": ["keyword1", "keyword2"],
                     "match_any": True,
                     "fuzzy_exclusions": []
                 },
                 "blacklist": {
-                    "keywords": [],
+                    "keywords": ["bait", "fake"],
                     "match_any": True,
                     "fuzzy_exclusions": []
                 }
             }
         }
-    },
-    1313799612263305238: {
-        "name": "shibrazy testing",
-        "channels": {
-            "1315241732316729455": {
-                "name": "biomes-debug",
-                "webhook_url": os.getenv('SOLS_RNG_BIOMES_WEBHOOK'),
-                "format": "new",  # Can be "old" or "new"
-                "game_id": "15532962292",
-                "game_name": "Sol's RNG [Eon1-1]",
-                "whitelist": {
-                    "keywords": [],
-                    "match_any": True,
-                    "fuzzy_exclusions": []
-                },
-                "blacklist": {
-                    "keywords": [],
-                    "match_any": True,
-                    "fuzzy_exclusions": []
-                }
-            },
-            "1318129882378534974": {
-                "name": "merchants-debug",
-                "webhook_url": os.getenv('SOLS_RNG_MERCHANTS_WEBHOOK'),
-                "format": "new",  # Can be "old" or "new"
-                "game_id": "15532962292",
-                "game_name": "Sol's RNG [Eon1-1]",
-                "whitelist": {
-                    "keywords": [],
-                    "match_any": True,
-                    "fuzzy_exclusions": []
-                },
-                "blacklist": {
-                    "keywords": [],
-                    "match_any": True,
-                    "fuzzy_exclusions": []
-                }
-            },
-        }
-    },
+    }
 }
 
 # Timing configuration table
@@ -217,7 +139,7 @@ VIP = {
     "benefits": {
         "bypass_blacklist": True,
         "bypass_whitelist": True,
-        "play_vip_sound": True,
+        "play_vip_sound": False,
         "priority_processing": True
     }
 }
@@ -277,30 +199,18 @@ OUTPUT = {
 
 # Emulator configuration table
 EMULATOR = {
-    "use_emulator": True,
+    "use_emulator": False,
 }
 
 # Sound configuration table
 SOUND = {
     "enabled": True,
-    "directory": os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "sounds", "keyword_find"),
+    "directory": os.path.join(os.path.dirname(os.path.dirname(__file__)), "sounds", "keyword_find"),
     "volume": 0.8,
     "keyword_sounds": {
         # Specific keyword to sound mappings
         "keywords": {
-            "glitch": "screaming.mp3",
-            "glitched": "screaming.mp3",
-            "jester": "screaming.mp3",
-            "oblivion": "screaming.mp3",
-            "mari": "screaming.mp3",
-            "lucky": "screaming.mp3",
-            "penny": "screaming.mp3",
-            "vc": "screaming.mp3",
-            "lp": "screaming.mp3",
-            "void": "screaming.mp3",
-            "coin": "screaming.mp3",
-            "gear": "screaming.mp3",
-            "trash": "screaming.mp3",
+            "example_keyword": "example_sound.mp3",
         }
     }
 }

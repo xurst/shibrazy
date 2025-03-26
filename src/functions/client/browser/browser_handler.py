@@ -1,6 +1,6 @@
 import webbrowser
 from datetime import datetime
-from src.core.constants import (
+from core.constants import (
     TIMING,
     EMULATOR
 )
