@@ -3,6 +3,8 @@ import time
 import keyboard
 import threading
 import subprocess
+import requests
+from packaging import version
 from src.core.constants import (
     INTERFACE,
     ANIMATION,
@@ -19,6 +21,7 @@ from src.functions.client.browser.browser_handler import BrowserHandler
 from src.functions.client.discord.discord_handler import DiscordHandler
 from src.functions.client.message_handler import MessageChecker
 from src.functions.client.emulator import EmulatorHandler
+from src.functions.github_updater import GitHubUpdater
 from bot_state import BotState
 import os
 from dotenv import load_dotenv
@@ -174,6 +177,19 @@ class MainRunner:
             self.toggle_event.set()
 
 if __name__ == "__main__":
+    updater = GitHubUpdater(
+        repo_owner="xurst",
+        repo_name="shibrazy",
+        current_version=SHIBRAZY_VERSION
+    )
+    
+    if updater.check_for_update():
+        if updater.prompt_for_update():
+            updater.download_and_install_update()
+        else:
+            print(f"{Fore.RED}update required to run the application. exiting...{Style.RESET_ALL}")
+            sys.exit(1)
+
     if not INTERFACE.get("mode") == "terminal" or "CHILD_PROCESS" in sys.argv:
         create_default_env()
 
