@@ -18,5 +18,11 @@ src
 # But allow the sounds folder in dist
 !/dist/sounds/
 
+# Ignore requirements.txt in the root directory
+/requirements.txt
+
+# But allow requirements.txt in dist
+!/dist/requirements.txt
+
 .pyarmor_capsule.zip
 .pyarmor_license.txt
