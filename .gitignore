@@ -10,3 +10,8 @@ saved_key.json
 .DS_Store
 Thumbs.db
 server/*
+
+/src/
+
+.pyarmor_capsule.zip
+.pyarmor_license.txt

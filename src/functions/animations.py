@@ -147,4 +147,4 @@ def startup_sequence(config):
         print_banner(config)
     except Exception as e:
         print(f"{Fore.RED}animation error: {e}{Style.RESET_ALL}")
-        print_banner(config)  # Fallback to regular banner
+        print_banner(config)

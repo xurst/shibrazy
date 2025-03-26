@@ -7,18 +7,19 @@ import subprocess
 from pathlib import Path
 import tempfile
 import zipfile
+from colorama import Fore, Style  # Add this import
 
 class GitHubUpdater:
-    """Handles checking for and applying updates from GitHub."""
+    """handles checking for and applying updates from github."""
     
     def __init__(self, repo_owner, repo_name, current_version):
         """
-        Initialize the updater with repository details.
+        initialize the updater with repository details.
         
-        Args:
-            repo_owner (str): GitHub repository owner
-            repo_name (str): GitHub repository name
-            current_version (str): Current version of the application
+        args:
+            repo_owner (str): github repository owner
+            repo_name (str): github repository name
+            current_version (str): current version of the application
         """
         self.repo_owner = repo_owner
         self.repo_name = repo_name
@@ -28,10 +29,10 @@ class GitHubUpdater:
         
     def check_for_update(self):
         """
-        Check if an update is available.
+        check if an update is available.
         
-        Returns:
-            bool: True if an update is available, False otherwise
+        returns:
+            bool: true if an update is available, false otherwise
         """
         try:
             response = requests.get(self.api_url, timeout=10)
@@ -46,17 +47,17 @@ class GitHubUpdater:
             
     def prompt_for_update(self):
         """
-        Display update prompt and handle user response.
+        display update prompt and handle user response.
         
-        Returns:
-            bool: True if user chose to update, False otherwise
+        returns:
+            bool: true if user chose to update, false otherwise
         """
         if not self.release_info:
             return False
             
         latest_version = self.release_info['tag_name'].lstrip('v')
         
-        print(f"\n{Fore.CYAN}=== update Available ==={Style.RESET_ALL}")
+        print(f"\n{Fore.CYAN}=== update available ==={Style.RESET_ALL}")
         print(f"current version: {Fore.RED}v{self.current_version}{Style.RESET_ALL}")
         print(f"latest version: {Fore.GREEN}v{latest_version}{Style.RESET_ALL}")
         
@@ -79,54 +80,54 @@ class GitHubUpdater:
                 
     def download_and_install_update(self):
         """
-        Download and install the latest update.
+        download and install the latest update.
         
-        Returns:
-            bool: True if update was successful, False otherwise
+        returns:
+            bool: true if update was successful, false otherwise
         """
         if not self.release_info:
             return False
             
         try:
-            # Get download URL for zip file
+            # get download url for zip file
             zip_url = None
             for asset in self.release_info.get('assets', []):
                 if asset['name'].endswith('.zip'):
                     zip_url = asset['browser_download_url']
                     break
                     
-            # Fall back to source code if no zip asset found
+            # fall back to source code if no zip asset found
             if not zip_url:
                 zip_url = self.release_info['zipball_url']
                 
             print(f"{Fore.CYAN}downloading update...{Style.RESET_ALL}")
             
-            # Download the update
+            # download the update
             response = requests.get(zip_url, stream=True, timeout=60)
             response.raise_for_status()
             
-            # Create a temporary directory for the download
+            # create a temporary directory for the download
             with tempfile.TemporaryDirectory() as temp_dir:
                 zip_path = os.path.join(temp_dir, "update.zip")
                 
-                # Save the zip file
+                # save the zip file
                 with open(zip_path, 'wb') as f:
                     for chunk in response.iter_content(chunk_size=8192):
                         f.write(chunk)
                         
-                # Create the new directory for the update
+                # create the new directory for the update
                 current_dir = Path(os.path.abspath(__file__)).parent
                 parent_dir = current_dir.parent
                 new_dir_name = f"{self.repo_name}-{self.release_info['tag_name'].lstrip('v')}"
                 new_dir = os.path.join(parent_dir, new_dir_name)
                 
-                # Extract the zip file
+                # extract the zip file
                 with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-                    # Get the root directory in the zip
+                    # get the root directory in the zip
                     root_dir = zip_ref.namelist()[0].split('/')[0]
                     zip_ref.extractall(temp_dir)
                     
-                    # Move files to the new directory
+                    # move files to the new directory
                     extracted_dir = os.path.join(temp_dir, root_dir)
                     if os.path.exists(new_dir):
                         shutil.rmtree(new_dir)
@@ -135,10 +136,11 @@ class GitHubUpdater:
             print(f"{Fore.GREEN}update downloaded successfully to: {new_dir}{Style.RESET_ALL}")
             print(f"{Fore.YELLOW}starting new version...{Style.RESET_ALL}")
             
-            # Launch the new version
+            # launch the new version
             new_main_py = os.path.join(new_dir, "main.py")
             subprocess.Popen([sys.executable, new_main_py])
             
+            # exit the current instance
             sys.exit(0)
             
         except Exception as e:
