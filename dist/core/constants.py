@@ -8,17 +8,17 @@ INTERFACE = {
     "mode": "terminal"  # Options: "terminal" or "app"
 }
 
-SHIBRAZY_VERSION = 1.47
+SHIBRAZY_VERSION = 1.48
 
 # Animation configuration tables
 ANIMATION = {
-    "enabled": True,  # Master toggle for all animations
+    "enabled": False,  # Master toggle for all animations
 
     "title": {
         "text": f"shibrazy v{SHIBRAZY_VERSION}",
         "color": "RED",
         "glitch_iterations": 3,
-        "glitch_chars": "!@#$%^&*()_+-={}[]|;:,.<>?",
+        "glitch_chars": "!;:,.<>?",
         "glitch_probability": 0.3
     },
 
@@ -42,14 +42,9 @@ ANIMATION = {
         "systems": [
             "MEMORY ALLOCATION",
             "NETWORK PROTOCOLS",
-            "API ENDPOINTS",
-            "SECURITY MODULES",
-            "DISCORD GATEWAY",
-            "WEBSOCKET CONNECTION",
-            "DATABASE INTEGRITY",
-            "MONITORING SYSTEMS"
+            "API ENDPOINTS"
         ],
-        "statuses": ["OK", "VERIFIED", "ACTIVE", "STABLE"],
+        "statuses": ["OK"],
         "delay_range": [0.1, 0.3]
     },
 
