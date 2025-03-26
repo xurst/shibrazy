@@ -31,8 +31,6 @@ def obfuscate():
 
                 modified_content = re.sub(r'from src\.', 'from ', content)
                 modified_content = re.sub(r'import src\.', 'import ', modified_content)
-                
-                # Special handling for constants.py paths
                 if file == "constants.py" or file == "template_constants.py":
                     modified_content = re.sub(
                         r'os\.path\.join\(os\.path\.dirname\(os\.path\.dirname\(os\.path\.dirname\(__file__\)\)\)\s*,\s*"sounds"\s*,\s*"keyword_find"\)',
@@ -44,7 +42,6 @@ def obfuscate():
                     f.write(modified_content)
     
     os.makedirs("dist", exist_ok=True)
-
     files_to_obfuscate = []
     for root, _, files in os.walk(temp_src):
         for file in files:
@@ -67,26 +64,23 @@ def obfuscate():
         except subprocess.CalledProcessError as e:
             print(f"error obfuscating {file}: {e}")
 
-    # Handle template_constants.py - copy and rename to constants.py
     for root, _, files in os.walk(temp_src):
         for file in files:
             if file == "template_constants.py":
                 src_file = os.path.join(root, file)
                 rel_path = os.path.relpath(src_file, temp_src)
                 dst_dir = os.path.join("dist", os.path.dirname(rel_path))
-                dst_file = os.path.join(dst_dir, "constants.py")  # Rename to constants.py
+                dst_file = os.path.join(dst_dir, "constants.py")
                 os.makedirs(os.path.dirname(dst_file), exist_ok=True)
                 shutil.copy2(src_file, dst_file)
                 print(f"template_constants.py copied and renamed to constants.py in {dst_dir}")
             elif file == "constants.py" and not any(f == "template_constants.py" for f in os.listdir(root)):
-                # Only copy constants.py if no template_constants.py exists in the same directory
                 src_file = os.path.join(root, file)
                 rel_path = os.path.relpath(src_file, temp_src)
                 dst_file = os.path.join("dist", rel_path)
                 os.makedirs(os.path.dirname(dst_file), exist_ok=True)
                 shutil.copy2(src_file, dst_file)
                 print(f"constants.py copied to {os.path.dirname(dst_file)}")
-
     for root, _, files in os.walk("src"):
         for file in files:
             if not file.endswith(".py"):
