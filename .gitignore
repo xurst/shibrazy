@@ -13,5 +13,10 @@ server/*
 temp_src
 src
 
+# Ignore the sounds folder in the root directory
+/sounds/
+# But allow the sounds folder in dist
+!/dist/sounds/
+
 .pyarmor_capsule.zip
 .pyarmor_license.txt
