@@ -17,3 +17,4 @@ src
 
 *.pyc
 !/dist/**/*.pyc
+tests/**/*.pyc
