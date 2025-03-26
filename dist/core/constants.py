@@ -8,7 +8,7 @@ INTERFACE = {
     "mode": "terminal"  # Options: "terminal" or "app"
 }
 
-SHIBRAZY_VERSION = 1.48
+SHIBRAZY_VERSION = 1.47
 
 # Animation configuration tables
 ANIMATION = {
