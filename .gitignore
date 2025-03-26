@@ -1,7 +1,3 @@
-__pycache__/
-*.py[cod]
-*$py.class
-
 *.env
 saved_key.json
 
@@ -18,6 +14,3 @@ src
 
 /requirements.txt
 !/dist/requirements.txt
-
-.pyarmor_capsule.zip
-.pyarmor_license.txt
