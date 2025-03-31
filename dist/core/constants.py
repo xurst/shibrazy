@@ -3,22 +3,22 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Interface configuration table
+# interface configuration table
 INTERFACE = {
-    "mode": "terminal"  # Options: "terminal" or "app"
+    "mode": "terminal"  # options: "terminal" or "app"
 }
 
 SHIBRAZY_VERSION = 1.48
 
-# Animation configuration tables
+# animation configuration tables
 ANIMATION = {
-    "enabled": False,  # Master toggle for all animations
+    "enabled": True,  # master toggle for all animations
 
     "title": {
         "text": f"shibrazy v{SHIBRAZY_VERSION}",
         "color": "RED",
         "glitch_iterations": 3,
-        "glitch_chars": "!;:,.<>?",
+        "glitch_chars": "!@#$%^&*()_+-={}[]|;:,.<>?",
         "glitch_probability": 0.3
     },
 
@@ -42,15 +42,20 @@ ANIMATION = {
         "systems": [
             "MEMORY ALLOCATION",
             "NETWORK PROTOCOLS",
-            "API ENDPOINTS"
+            "API ENDPOINTS",
+            "SECURITY MODULES",
+            "DISCORD GATEWAY",
+            "WEBSOCKET CONNECTION",
+            "DATABASE INTEGRITY",
+            "MONITORING SYSTEMS"
         ],
-        "statuses": ["OK"],
+        "statuses": ["OK", "VERIFIED", "ACTIVE", "STABLE"],
         "delay_range": [0.1, 0.3]
     },
 
     "banner": {
         "color": "MAGENTA",
-        "text": [  # ASCII banner text
+        "text": [  # ascii banner text
             """
   ███████╗██╗  ██╗██╗██████╗ ██████╗  █████╗ ███████╗██╗   ██╗    ██╗
   ██╔════╝██║  ██║██║██╔══██╗██╔══██╗██╔══██╗╚══███╔╝╚██╗ ██╔╝    ██║
@@ -80,7 +85,7 @@ ANIMATION = {
     }
 }
 
-# Notification configuration table
+# notification configuration table
 NOTIFICATIONS = {
     "enabled": False,
     "startup_test": False,
@@ -91,15 +96,15 @@ NOTIFICATIONS = {
     }
 }
 
-# Server configuration table
+# server configuration table
 SERVERS = {
-    0000000000000000000: {  # Placeholder server ID
+    0000000000000000000: {  # placeholder server id
         "name": "Placeholder Server",
         "channels": {
-            000000000000000000: {  # Placeholder channel ID
+            000000000000000000: {  # placeholder channel id
                 "name": "placeholder-channel",
                 "webhook_url": os.getenv('PLACEHOLDER_WEBHOOK'),
-                "format": "new",
+                "format": "new",  # can be "old" or "new"
                 "game_id": "00000000000",
                 "game_name": "Placeholder Game",
                 "whitelist": {
@@ -117,10 +122,10 @@ SERVERS = {
     }
 }
 
-# Timing configuration table
+# timing configuration table
 TIMING = {
-    "check_delay": 0.01,  # Reduced from 0.05 for faster checking
-    "rate_limit_delay": 0.05,  # Reduced from 0.1 for faster recovery
+    "check_delay": 0.01,  # reduced from 0.05 for faster checking
+    "rate_limit_delay": 0.05,  # reduced from 0.1 for faster recovery
     "link_timer": 5,
     "overlapping": False
 }
@@ -128,8 +133,8 @@ TIMING = {
 VIP = {
     "enabled": True,
     "users": [
-        "994927455175458857",  # Original VIP user
-        # Add more VIP user IDs here
+        "994927455175458857",  # original vip user
+        # add more vip user ids here
     ],
     "benefits": {
         "bypass_blacklist": True,
@@ -139,7 +144,7 @@ VIP = {
     }
 }
 
-# Fuzzy matching configuration table
+# fuzzy matching configuration table
 FUZZY = {
     "whitelist": {
         "enabled": True,
@@ -148,9 +153,9 @@ FUZZY = {
         "ignore_case": True,
         "min_length": 0,
         "word_handling": {
-            "split_compound_words": True,  # Enable splitting of compound words
-            "split_characters": ["-", "_", "+", "."],  # Characters to split words on
-            "remove_special_chars": True,  # Remove special characters before matching
+            "split_compound_words": True,  # enable splitting of compound words
+            "split_characters": ["-", "_", "+", "."],  # characters to split words on
+            "remove_special_chars": True,  # remove special characters before matching
             "special_chars": ["!", "@", "#", "$", "%", "^", "&", "*", "(", ")", ",", "?"]
         }
     },
@@ -169,7 +174,7 @@ FUZZY = {
     }
 }
 
-# Processing configuration table
+# processing configuration table
 PROCESSING = {
     "enable_stats": True,
     "stats_directory": "stats",
@@ -182,7 +187,7 @@ PROCESSING = {
     }
 }
 
-# Output configuration table
+# output configuration table
 OUTPUT = {
     "actual_joining": True,
     "disable_bot_on_join": True,
@@ -192,18 +197,18 @@ OUTPUT = {
     "toggle_hotkey": 'ctrl+y',
 }
 
-# Emulator configuration table
+# emulator configuration table
 EMULATOR = {
     "use_emulator": False,
 }
 
-# Sound configuration table
+# sound configuration table
 SOUND = {
     "enabled": True,
     "directory": os.path.join(os.path.dirname(os.path.dirname(__file__)), "sounds", "keyword_find"),
     "volume": 0.8,
     "keyword_sounds": {
-        # Specific keyword to sound mappings
+        # specific keyword to sound mappings
         "keywords": {
             "example_keyword": "example_sound.mp3",
         }

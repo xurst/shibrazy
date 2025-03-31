@@ -10,4 +10,4 @@ discord-webhook>=1.1.0
 aiohttp>=3.8.4
 python-dateutil>=2.8.2
 fuzzywuzzy>=0.18.0
-python-Levenshtein>=0.21.0  # Optional but improves fuzzywuzzy performance
+python-Levenshtein>=0.21.0
