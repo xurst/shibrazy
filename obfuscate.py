@@ -6,7 +6,6 @@ import glob
 import re
 
 def obfuscate():
-    """obfuscate source code and fix imports for github distribution"""
     if os.path.exists("dist"):
         shutil.rmtree("dist")
 
