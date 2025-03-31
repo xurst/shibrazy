@@ -112,6 +112,16 @@ def obfuscate():
                 dst_file = os.path.join(target_dir, file)
                 shutil.copy2(src_file, dst_file)
         
+        keyword_find_dir = os.path.join("dist", "sounds", "keyword_find")
+        if os.path.exists(keyword_find_dir):
+            shutil.rmtree(keyword_find_dir)
+            print("keyword_find directory removed from dist/sounds")
+        
+        readme_path = os.path.join("dist", "sounds", "README.txt")
+        with open(readme_path, 'w', encoding='utf-8') as f:
+            f.write("HAHAHHAHA BITCH NO SOUNDS FOR U HAHAHAHAHAHAHA")
+        print("README.txt created in dist/sounds with message: 'HAHAHHAHA BITCH NO SOUNDS FOR U HAHAHAHAHAHAHA'")
+        
         print("sounds directory copied to dist folder")
     else:
         print("warning: sounds directory not found in project root")
