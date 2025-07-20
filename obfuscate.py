@@ -15,7 +15,7 @@ def obfuscate():
     
     for root, _, files in os.walk("src"):
         for file in files:
-            if file.endswith(".py"):
+            if file.endswith(".py") and file != ".env":
 
                 rel_dir = os.path.relpath(root, "src")
                 target_dir = os.path.join(temp_src, rel_dir)
@@ -119,8 +119,8 @@ def obfuscate():
         
         readme_path = os.path.join("dist", "sounds", "README.txt")
         with open(readme_path, 'w', encoding='utf-8') as f:
-            f.write("HAHAHHAHA BITCH NO SOUNDS FOR U HAHAHAHAHAHAHA")
-        print("README.txt created in dist/sounds with message: 'HAHAHHAHA BITCH NO SOUNDS FOR U HAHAHAHAHAHAHA'")
+            f.write("no default sounds")
+        print("'no default sounds' message created in dist/sounds")
         
         print("sounds directory copied to dist folder")
     else:
