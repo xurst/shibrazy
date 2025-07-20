@@ -8,9 +8,11 @@ Thumbs.db
 server/*
 temp_src
 src
+server
 
 /sounds/
 !/dist/sounds/
+/secret_detection_stuff/
 
 /requirements.txt
 !/dist/requirements.txt
