@@ -20,3 +20,5 @@ server
 *.pyc
 !/dist/**/*.pyc
 tests/**/*.pyc
+tempCodeRunnerFile.py
+__pycache__/
