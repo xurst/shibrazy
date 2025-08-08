@@ -8,6 +8,7 @@ Thumbs.db
 server/*
 temp_src
 src
+venv
 server
 
 /sounds/
